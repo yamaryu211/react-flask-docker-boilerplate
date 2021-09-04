@@ -1,21 +1,19 @@
 from flask import Flask, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR # MySQLのテーブル作成の際に必要
 
 app = Flask(__name__)
 
-# MySQLの設定
-app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://{user}:{password}@{host}/{db_name}?charset=utf8'.format(**{
-    'user': "docker",
-    'password': "docker",
-    'host': "localhost",
-    'db_name': "testdb"
-    })
-# おまじない
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config.from_object('app.config.Config') # config.pyの設定内容を読み込み
 
 # dbの初期化
 db = SQLAlchemy(app)
+Migrate(app,db)
+
+# models.py
+from app import models #順番に注意。でないと循環参照となりエラー。
+app.register_blueprint(models.models_blueprint)
 
 @app.route('/api/v1.0/test', methods=['GET'])
 def test_response():

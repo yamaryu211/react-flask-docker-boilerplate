@@ -9,7 +9,7 @@ services:
     environment:
       TZ: Asia/Tokyo
       FLASK_ENV: development
-      FLASK_APP: /backend/run.py
+      FLASK_APP: /backend/run.py  # 何故かコンテナ起動時に実行されない...
     ports:
       - "5000:5000"
     depends_on:  # apiサーバーはdbサーバーが立ってから起動
