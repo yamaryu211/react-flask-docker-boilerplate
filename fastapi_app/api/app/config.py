@@ -7,7 +7,7 @@ class DevelopmentConfig:
         'user': "root",
         'password': "pass",
         'host': "db:3306",
-        'database': "testdb"
+        'database': "sample_db"
     })
     SQLALCHEMY_TRACK_MODIFICATIONS = False # おまじない
     SQLALCHEMY_ECHO = False
