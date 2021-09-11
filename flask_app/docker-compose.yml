@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  api:
+    build: api
+    command: ["flask", "run", "-h", "0.0.0.0"]
+    volumes:
+      - ./api:/backend
+    environment:
+      TZ: Asia/Tokyo
+      FLASK_ENV: development
+      FLASK_APP: /backend/run.py  # 何故かコンテナ起動時に実行されない...
+    ports:
+      - "5000:5000"
+    depends_on:  # apiサーバーはdbサーバーが立ってから起動
+      - db
+    networks:  # apiとdbを接続するための共通ネットワーク指定
+      - app_net
+
+  db:
+    build: db
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: Asia/Tokyo
+    volumes:
+      - ./db/data:/var/lib/mysql
+    command: mysqld
+    networks:
+      - app_net
+
+  client:
+    build: client
+    command: ["npm", "start"]
+    volumes:
+      - ./client:/frontend
+      - node-modules:/frontend/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+volumes:
+  node-modules:
+ #   driver_opts:
+ #     type: none
+ #     device: ./client/node_modules
+ #     o: bind
+  data:
+ #   driver_opts:
+ #     type: none
+ #     device: ./db/data
+ #     o: bind
+
+networks:
+  app_net:
+    driver: bridge
