@@ -13,6 +13,7 @@ services:
       - db
     networks:  # apiとdbを接続するための共通ネットワーク指定
       - app_net
+    command: uvicorn app.main:app --reload --host 0.0.0.0
 
   db:
     # path配下のDockerfile読み込み

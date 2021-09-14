@@ -14,5 +14,5 @@ class DevelopmentConfig:
 
 Config = DevelopmentConfig
 
-# DBのhostは、dockerのネットワークを調べたうえで記入する必要あり
+# DBのhostは、dockerのネットワークを調べたうえで記入する必要あり→不要で、コンテナ名で接続できた！
 # なので、コンテナをbuild,upした後で記入
