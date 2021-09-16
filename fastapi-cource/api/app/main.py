@@ -1,10 +1,7 @@
-import os
 from fastapi import FastAPI
 from .src import  models
 from .src.database import engine
 from .src.routers import blog, user, authentication
-
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = FastAPI()
 
