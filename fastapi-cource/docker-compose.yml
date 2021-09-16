@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  api:
+    build: api
+    volumes:
+      - ./api:/backend
+    environment:
+      TZ: Asia/Tokyo
+    ports:
+      - "8000:8000"
+    depends_on:  # apiサーバーはdbサーバーが立ってから起動
+      - db
+    networks:  # apiとdbを接続するための共通ネットワーク指定
+      - app_net
+    command: uvicorn app.main:app --reload --host 0.0.0.0
+
+  db:
+    # path配下のDockerfile読み込み
+    build: db
+    # コンテナが落ちたら再起動する
+    restart: always
+    tty: true
+    ports:
+      - '3306:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: Asia/Tokyo
+    volumes:
+      - ./db/initdb.d:/docker-entrypoint-initdb.d # 定義どおりにテーブル作成
+      - ./db/conf.d:/etc/mysql/conf.d # MySQLの基本設定(文字化け対策)
+      - ./log/mysql:/var/log/mysql # ログの保存
+    command: mysqld
+    networks:
+      - app_net
+
+  client:
+    build: client
+    command: ["npm", "start"]
+    volumes:
+      - ./client:/frontend
+      - node-modules:/frontend/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+volumes:
+  node-modules:
+#   driver_opts:
+#     type: none
+#     device: ./client/node_modules
+#     o: bind
+  data:
+#   driver_opts:
+#     type: none
+#     device: ./db/data
+#     o: bind
+
+networks:
+  app_net:
+    driver: bridge

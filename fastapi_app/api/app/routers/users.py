@@ -30,6 +30,7 @@ async def create_user(name: str, age: int):
     user.age = age
     db.session.add(user)
     db.session.commit()
+    return user
 
 # 複数のユーザ情報を更新 PUT
 @router.put("/users")
